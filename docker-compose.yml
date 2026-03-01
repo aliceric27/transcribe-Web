@@ -1,0 +1,33 @@
+services:
+  transcribe:
+    build: .
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+
+    ports:
+      - "8092:80"
+
+    volumes:
+      - transcribe-data:/app/data
+
+    environment:
+      - MAX_UPLOAD_SIZE_MB=2048
+      - NVIDIA_VISIBLE_DEVICES=all
+
+    restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - transcribe
+    restart: unless-stopped
+
+volumes:
+  transcribe-data:

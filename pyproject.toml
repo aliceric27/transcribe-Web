@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=65.5.1", "setuptools-scm", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "transcribe-anything"
+readme = "README.md"
+description = "Uses Whisper AI to transcribe speech from video and audio files. Also accepts URLs for YouTube, Rumble, BitChute, clear file links, etc."
+requires-python = ">=3.10"
+keywords = ["transcribe", "openai", "whisper"]
+license = { text = "BSD-3-Clause" }
+dependencies = [
+    "static-ffmpeg>=2.7",
+    "yt-dlp>=2025.1.15",
+    "appdirs>=1.4.4",
+    "disklru>=1.0.7",
+    "FileLock",
+    "webvtt-py==0.4.6",
+    "uv-iso-env>=1.0.43",
+    "python-dotenv>=1.0.1",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "python-multipart>=0.0.9",
+]
+# VERSION
+version = "3.2.4"  # Update this manually or configure setuptools-scm for automatic versioning
+maintainers = [{ name = "Zachary Vorhies", email = "dont@email.me" }]
+
+[project.urls]
+homepage = "https://github.com/zackees/transcribe-anything"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["transcribe_anything*"]
+exclude = ["tests*", "docs*", "examples*"]
+namespaces = false  # Prevent setuptools from looking elsewhere
+
+
+
+
+[tool.ruff]
+line-length = 200
+
+[tool.pylint."MESSAGES CONTROL"]
+good-names = ["c", "i", "ok", "id", "e", "f"]
+disable = [
+    "missing-function-docstring",
+    "missing-module-docstring"
+]
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+ignore_missing_imports = true
+disable_error_code = ["import-untyped"]
+
+[tool.black]
+line-length = 200
+target-version = ['py310']
+
+[tool.uv.workspace]
+members = ["tmp"]
+
+[project.scripts]
+transcribe_anything = "transcribe_anything._cmd:main"
+transcribe-anything = "transcribe_anything._cmd:main"
+transcribe-anything-init-insane = "transcribe_anything.cli_init_insane:main"
+transcribe-anything-init-cuda = "transcribe_anything.cli_init_cuda:main"
+transcribe-anything-web = "transcribe_anything.webapp:main"
