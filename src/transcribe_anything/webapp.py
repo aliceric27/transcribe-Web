@@ -24,7 +24,7 @@ DEFAULT_DATA_ROOT = APP_DIR / "data" if APP_DIR.exists() else Path.cwd() / "data
 DATA_ROOT = Path(os.environ.get("TRANSCRIBE_ANYTHING_WEB_DATA_DIR", str(DEFAULT_DATA_ROOT)))
 UPLOADS_ROOT = DATA_ROOT / "uploads"
 RESULTS_ROOT = DATA_ROOT / "results"
-MAX_UPLOAD_SIZE_MB = int(os.environ.get("MAX_UPLOAD_SIZE_MB", "2048"))
+MAX_UPLOAD_SIZE_MB = int(os.environ.get("MAX_UPLOAD_SIZE_MB", "100"))
 MAX_UPLOAD_SIZE_BYTES = MAX_UPLOAD_SIZE_MB * 1024 * 1024
 ALLOWED_EXTENSIONS = {
     ".mp4",

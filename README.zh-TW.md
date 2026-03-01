@@ -112,7 +112,7 @@ Image 預設啟動為 Web 模式：
   - 對外埠：`8092:80`
   - Volume：`transcribe-data:/app/data`
   - 環境變數：
-    - `MAX_UPLOAD_SIZE_MB=2048`
+    - `MAX_UPLOAD_SIZE_MB=100`
     - `NVIDIA_VISIBLE_DEVICES=all`
 - `cloudflared`
   - 映像：`cloudflare/cloudflared:latest`
@@ -134,7 +134,7 @@ docker compose up -d
 
 ### 上傳大小限制
 
-- 應用端限制由 `MAX_UPLOAD_SIZE_MB` 控制（預設 `2048`）。
+- 應用端限制由 `MAX_UPLOAD_SIZE_MB` 控制（預設 `100`）。
 - 公網網址仍可能受 Cloudflare edge 上傳限制。
 - 超大檔案建議走本機入口：`http://localhost:8092`。
 

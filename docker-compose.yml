@@ -15,7 +15,7 @@ services:
       - transcribe-data:/app/data
 
     environment:
-      - MAX_UPLOAD_SIZE_MB=2048
+      - MAX_UPLOAD_SIZE_MB=100
       - NVIDIA_VISIBLE_DEVICES=all
 
     restart: unless-stopped
