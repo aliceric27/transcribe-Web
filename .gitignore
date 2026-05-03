@@ -12,3 +12,12 @@ activate.sh
 uv.lock
 dist/
 build/
+.agents/
+.claude/
+.omc/
+.omx/
+AGENTS.md
+CLAUDE.md
+.spectra/
+openspec/
+openspec/.vector-search.db*
