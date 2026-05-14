@@ -117,7 +117,7 @@ The image defaults to web mode:
   - Port mapping: `8092:80`
   - Volume: `transcribe-data:/app/data`
   - Env:
-    - `MAX_UPLOAD_SIZE_MB=100`
+    - `MAX_UPLOAD_SIZE_MB=0`
     - `NVIDIA_VISIBLE_DEVICES=all`
 - `cloudflared`
   - Image: `cloudflare/cloudflared:latest`
@@ -139,7 +139,7 @@ docker compose up -d
 
 ### Upload limits
 
-- App-side upload limit is controlled by `MAX_UPLOAD_SIZE_MB` (default `100`).
+- App-side upload limit is controlled by `MAX_UPLOAD_SIZE_MB` (default unlimited; set `0`, `none`, or `unlimited` for no limit).
 - Cloudflare edge upload limits may still apply on public URLs.
 - For very large uploads, use local endpoint `http://localhost:8092`.
 

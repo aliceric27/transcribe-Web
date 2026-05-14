@@ -24,8 +24,21 @@ DEFAULT_DATA_ROOT = APP_DIR / "data" if APP_DIR.exists() else Path.cwd() / "data
 DATA_ROOT = Path(os.environ.get("TRANSCRIBE_ANYTHING_WEB_DATA_DIR", str(DEFAULT_DATA_ROOT)))
 UPLOADS_ROOT = DATA_ROOT / "uploads"
 RESULTS_ROOT = DATA_ROOT / "results"
-MAX_UPLOAD_SIZE_MB = int(os.environ.get("MAX_UPLOAD_SIZE_MB", "100"))
-MAX_UPLOAD_SIZE_BYTES = MAX_UPLOAD_SIZE_MB * 1024 * 1024
+
+
+def _parse_upload_size_limit_mb(value: str) -> int | None:
+    normalized = value.strip().lower()
+    if normalized in {"", "0", "none", "unlimited", "no_limit", "nolimit"}:
+        return None
+    limit_mb = int(normalized)
+    if limit_mb < 0:
+        raise ValueError("MAX_UPLOAD_SIZE_MB must be 0, a positive integer, or unlimited")
+    return limit_mb
+
+
+MAX_UPLOAD_SIZE_MB = _parse_upload_size_limit_mb(os.environ.get("MAX_UPLOAD_SIZE_MB", "0"))
+MAX_UPLOAD_SIZE_BYTES = MAX_UPLOAD_SIZE_MB * 1024 * 1024 if MAX_UPLOAD_SIZE_MB is not None else None
+UPLOAD_LIMIT_LABEL = "無限制" if MAX_UPLOAD_SIZE_MB is None else f"{MAX_UPLOAD_SIZE_MB} MB"
 ALLOWED_EXTENSIONS = {
     ".mp4",
     ".mp3",
@@ -239,7 +252,7 @@ FRONTEND_HTML = """
         直接從瀏覽器上傳音訊或影片檔，交給 transcribe-anything 進行語音轉文字。
         GPU 任務會依序排隊執行，避免同時佔滿顯示卡記憶體。
       </p>
-      <p class="muted">支援格式：mp4、mp3、wav、m4a、webm、ogg、flac、mkv、avi。單檔上限：__MAX_UPLOAD_SIZE_MB__ MB。</p>
+      <p class="muted">支援格式：mp4、mp3、wav、m4a、webm、ogg、flac、mkv、avi。單檔上限：__UPLOAD_LIMIT_LABEL__。</p>
     </div>
 
     <div class="hero">
@@ -605,7 +618,7 @@ def _process_job(job_id: str, upload_path: Path, result_dir: Path, model: str, d
 
 @app.get("/", response_class=HTMLResponse)
 def index() -> HTMLResponse:
-    return HTMLResponse(FRONTEND_HTML.replace("__MAX_UPLOAD_SIZE_MB__", str(MAX_UPLOAD_SIZE_MB)))
+    return HTMLResponse(FRONTEND_HTML.replace("__UPLOAD_LIMIT_LABEL__", UPLOAD_LIMIT_LABEL))
 
 
 @app.post("/api/transcribe")
@@ -636,7 +649,7 @@ async def create_transcription_job(
                 if not chunk:
                     break
                 bytes_written += len(chunk)
-                if bytes_written > MAX_UPLOAD_SIZE_BYTES:
+                if MAX_UPLOAD_SIZE_BYTES is not None and bytes_written > MAX_UPLOAD_SIZE_BYTES:
                     raise HTTPException(status_code=413, detail=f"檔案超過 {MAX_UPLOAD_SIZE_MB} MB 上限")
                 handle.write(chunk)
     except HTTPException:
